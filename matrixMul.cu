@@ -34,7 +34,7 @@
 #include <cuda_runtime.h>
 
 // Helper functions and utilities to work with CUDA
-#include <helper_functions.h>
+#include "common/inc/helper_functions.h"
 
 /**
  * Matrix multiplication (CUDA Kernel) on the device: C = A * B
