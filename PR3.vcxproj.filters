@@ -15,8 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="matrixMul.cu">
-      <Filter>Source Files</Filter>
-    </None>
+    <CudaCompile Include="matrixMul.cu" />
   </ItemGroup>
 </Project>
