@@ -1,11 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-extern void performTest(void);
+extern void performMultiBlockTests(void);
 
 int main(int argc, char ** argv)
 {
-	performTest();
+	performMultiBlockTests();
 
 	system("PAUSE");
 	return 0;

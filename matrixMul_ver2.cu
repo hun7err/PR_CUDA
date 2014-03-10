@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 #include <cuda_runtime.h>
 
@@ -21,32 +22,80 @@
 	}
 }
 
-void performTest(void)
+int performMultiBlockTest(dim3 block_size, int width)
 {
-	float A[] = {1.0f,2.0f,3.0f,4.0f};
-	float B[] = {5.0f,6.0f,7.0f,8.0f};
+	cudaError_t error;
 
-	float *C = (float*)malloc(4*sizeof(float));
-	memset(C, 0.0f, 4*sizeof(float));
+	float A[] = {1.0f,2.0f,3.0f,4.0f,5.0f,6.0f,7.0f,8.0f,9.0f,10.0f,11.0f,12.0f,13.0f,14.0f,15.0f,16.0f};
+	float B[] = {17.0f,18.0f,19.0f,20.0f,21.0f,22.0f,23.0f,24.0f,25.0f,26.0f,27.0f,28.0f,29.0f,30.0f,31.0f,32.0f};
+
+	float *C = (float*)malloc(16*sizeof(float));
+	memset(C, 0.0f, 16*sizeof(float));
 
 	float *A_d, *B_d, *C_d;
 
-	cudaMalloc((void**)&A_d, sizeof(A));
-	cudaMalloc((void**)&B_d, sizeof(B));
-	cudaMalloc((void**)&C_d, 4*sizeof(float));
+	error = cudaMalloc((void**)&A_d, sizeof(A));
 
-	cudaMemcpy(A_d, A, sizeof(A), cudaMemcpyHostToDevice);
-	cudaMemcpy(B_d, B, sizeof(B), cudaMemcpyHostToDevice);
+	if(error != cudaSuccess)
+	{
+		fprintf(stderr, "Could not allocate memory on the device for matrix A (line: %d)\n", __LINE__);
+		return -1;
+	}
 
-	matrixMulMultiBlock<<<1,dim3(2,2)>>>(C_d, A_d, B_d, 2);
+	error = cudaMalloc((void**)&B_d, sizeof(B));
 
-	cudaMemcpy(C, C_d, 4*sizeof(float), cudaMemcpyDeviceToHost);
+	if(error != cudaSuccess)
+	{
+		fprintf(stderr, "Could not allocate memory on the device for matrix B (line: %d)\n", __LINE__);
+		return -1;
+	}
 
-	printf("[[%f,%f],\n[%f,%f]]\n", C[0],C[1],C[2],C[3]);
+	error = cudaMalloc((void**)&C_d, 16*sizeof(float));
+
+	if(error != cudaSuccess)
+	{
+		fprintf(stderr, "Could not allocate memory on the device for matrix C (line: %d)\n", __LINE__);
+		return -1;
+	}
+
+	error = cudaMemcpy(A_d, A, sizeof(A), cudaMemcpyHostToDevice);
+
+	if(error != cudaSuccess)
+	{
+		fprintf(stderr, "Could not copy data from host to device (line: %d)\n", __LINE__);
+		return -1;
+	}
+
+	error = cudaMemcpy(B_d, B, sizeof(B), cudaMemcpyHostToDevice);
+
+	if(error != cudaSuccess)
+	{
+		fprintf(stderr, "Could not copy data from host to device (line: %d)\n", __LINE__);
+		return -1;
+	}
+
+	matrixMulMultiBlock<<<dim3(ceil((float)width/(float)block_size.x), ceil((float)width/(float)block_size.y)),block_size>>>(C_d, A_d, B_d, 4);
+
+	error = cudaMemcpy(C, C_d, 16*sizeof(float), cudaMemcpyDeviceToHost);
+	
+	if(error != cudaSuccess)
+	{
+		fprintf(stderr, "Could not copy data from device to host (line: %d)\n", __LINE__);
+		return -1;
+	}
 
 	cudaFree(C_d);
 	cudaFree(B_d);
 	cudaFree(A_d);
 
 	free(C);
+ }
+
+void performMultiBlockTests(void)
+{
+	performMultiBlockTest(dim3(3,3), 4);
+	/*performMultiBlockTest(dim3(8,8), 10);
+	performMultiBlockTest(dim3(16,16), 10);
+	performMultiBlockTest(dim3(22,22), 10);
+	performMultiBlockTest(dim3(32,32), 10);*/
 }
