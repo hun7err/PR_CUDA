@@ -71,7 +71,7 @@
     <LibraryPath>$(CUDA_LIB_PATH);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\NVIDIA\CUDA\CUDASamples\common\inc;$(CUDA_PATH)\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(CUDA_PATH)\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(CUDA_PATH)\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -79,7 +79,7 @@
     <LibraryPath>$(CUDA_LIB_PATH);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>C:\NVIDIA\CUDA\CUDASamples\common\inc;$(CUDA_PATH)\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(CUDA_PATH)\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(CUDA_PATH)\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -145,6 +145,7 @@
     <CudaCompile Include="matrixMul.cu">
       <FileType>CppCode</FileType>
       <DeploymentContent>true</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
     </CudaCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
