@@ -119,7 +119,7 @@ int performMultiBlockTest(dim3 block_size, int width)
 
 	for(int current_test = 0; current_test < TEST_COUNT; current_test++)
 	{
-		matrixMulMultiBlock<<<dim3((int)ceil((float)width/(float)block_size.x), (int)ceil((float)width/(float)block_size.y)),block_size>>>(C_d, A_d, B_d, 4);
+		matrixMulMultiBlock<<<dim3((int)ceil((float)width/(float)block_size.x), (int)ceil((float)width/(float)block_size.y)),block_size>>>(C_d, A_d, B_d, width);
 	}
 
 	error = cudaEventRecord(stop, NULL);
@@ -146,11 +146,11 @@ int performMultiBlockTest(dim3 block_size, int width)
         return -1;
 	}
 
-	float msecPerMatrixMul = totalTime / TEST_COUNT;
+	float msecPerMatrixMul = totalTime / (float)TEST_COUNT;
     double flopsPerMatrixMul = 2.0 * (double)width * (double)width * (double)width;
     double gigaFlops = (flopsPerMatrixMul * 1.0e-9f) / (msecPerMatrixMul / 1000.0f);
 
-	printf("Performance: %.2f GFlop/s\n", gigaFlops);
+	printf("Performance: %.2f GFlop/s, time: %.3f ms\n", gigaFlops, msecPerMatrixMul);
 
 	error = cudaMemcpy(C, C_d, width*width*sizeof(float), cudaMemcpyDeviceToHost);
 	
@@ -177,9 +177,8 @@ int performMultiBlockTest(dim3 block_size, int width)
 void performMultiBlockTests(void)
 {
 	srand((unsigned int)time(NULL));
-	//performMultiBlockTest(dim3(3,3), 4);
-	performMultiBlockTest(dim3(8,8), 200); // 10?
-	performMultiBlockTest(dim3(16,16), 200);
-	performMultiBlockTest(dim3(22,22), 200);
-	performMultiBlockTest(dim3(32,32), 200);
+	performMultiBlockTest(dim3(8,8), 512); // 10?
+	performMultiBlockTest(dim3(16,16), 512);
+	performMultiBlockTest(dim3(22,22), 512);
+	performMultiBlockTest(dim3(32,32), 512);
 }
