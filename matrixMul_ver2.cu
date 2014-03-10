@@ -177,8 +177,8 @@ int performMultiBlockTest(dim3 block_size, int width)
 void performMultiBlockTests(void)
 {
 	srand((unsigned int)time(NULL));
-	performMultiBlockTest(dim3(8,8), 512); // 10?
-	performMultiBlockTest(dim3(16,16), 512);
-	performMultiBlockTest(dim3(22,22), 512);
-	performMultiBlockTest(dim3(32,32), 512);
+	performMultiBlockTest(dim3(8,8), 12); // 10?
+	performMultiBlockTest(dim3(16,16), 12);
+	performMultiBlockTest(dim3(22,22), 12);
+	performMultiBlockTest(dim3(32,32), 12);
 }
