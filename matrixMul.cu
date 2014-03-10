@@ -350,6 +350,8 @@ int matrixMultiply(int argc, char **argv, int block_size, dim3 &dimsA, dim3 &dim
 /**
  * Program main
  */
+
+/*
 int main(int argc, char **argv)
 {
     printf("[Matrix Multiply Using CUDA] - Starting...\n");
@@ -442,4 +444,4 @@ int main(int argc, char **argv)
     int matrix_result = matrixMultiply(argc, argv, block_size, dimsA, dimsB);
 
     exit(matrix_result);
-}
+}*/
