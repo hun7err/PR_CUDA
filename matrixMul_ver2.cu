@@ -5,6 +5,7 @@
 #include <string.h>
 #include <math.h>
 #include <time.h>
+#include "genmatrix.h"
 
 #include <cuda_runtime.h>
 
@@ -23,7 +24,7 @@
 	}
 }
 
-float totalTime = 0.0f;
+static float totalTime = 0.0f;
 #define TEST_COUNT 300
 
 int performMultiBlockTest(dim3 block_size, int width)
@@ -32,20 +33,12 @@ int performMultiBlockTest(dim3 block_size, int width)
 
 	cudaError_t error;
 
-	//float A[] = {1.0f,2.0f,3.0f,4.0f,5.0f,6.0f,7.0f,8.0f,9.0f,10.0f,11.0f,12.0f,13.0f,14.0f,15.0f,16.0f};
-	//float B[] = {17.0f,18.0f,19.0f,20.0f,21.0f,22.0f,23.0f,24.0f,25.0f,26.0f,27.0f,28.0f,29.0f,30.0f,31.0f,32.0f};
 	float *A = (float*)malloc(width*width*sizeof(float));
 	float *B = (float*)malloc(width*width*sizeof(float));
 
-	for(int i = 0; i < width; i++)
-	{
-		for(int j = 0; j < width; j++)
-		{
-			A[i*width+j] = (float)rand() / (float)RAND_MAX;
-			B[i*width+j] = (float)rand() / (float)RAND_MAX;
-		}
-	}
-
+	generateTestMatrix(A, width);
+	generateTestMatrix(B, width);
+	
 	float *C = (float*)malloc(width*width*sizeof(float));
 	memset(C, 0, width*width*sizeof(float));
 
@@ -137,7 +130,8 @@ int performMultiBlockTest(dim3 block_size, int width)
 		fprintf(stderr, "Could not synchronize with stop event: %s (line: %d)\n", cudaGetErrorString(error), __LINE__);
         return -1;
 	}
-
+	
+	totalTime = 0.0f;
 	error = cudaEventElapsedTime(&totalTime, start, stop);
 
 	if(error != cudaSuccess)
@@ -177,8 +171,19 @@ int performMultiBlockTest(dim3 block_size, int width)
 void performMultiBlockTests(void)
 {
 	srand((unsigned int)time(NULL));
-	performMultiBlockTest(dim3(8,8), 12); // 10?
-	performMultiBlockTest(dim3(16,16), 12);
-	performMultiBlockTest(dim3(22,22), 12);
-	performMultiBlockTest(dim3(32,32), 12);
+
+	dim3 blockSizes[] = { dim3(8,8), dim3(16,16), dim3(22,22), dim3(32,32)};
+	int matrixSizes[] = { 32, 64, 128 };
+
+	for(int i = 0; i < sizeof(matrixSizes)/sizeof(int); i++)
+	{
+		printf("+++ %dx%d matrix +++\n", matrixSizes[i], matrixSizes[i]);
+
+		for(int j = 0; j < sizeof(blockSizes)/sizeof(dim3); j++)
+		{
+			printf("%dx%d block\n", blockSizes[i].x, blockSizes[i].y);
+
+			performMultiBlockTest(blockSizes[i], matrixSizes[i]);
+		}
+	}
 }
