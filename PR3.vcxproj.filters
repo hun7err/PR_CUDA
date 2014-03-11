@@ -24,6 +24,9 @@
     <CudaCompile Include="matrixMul_ver2.cu">
       <Filter>Source Files</Filter>
     </CudaCompile>
+    <CudaCompile Include="matrixMul_ver3.cu">
+      <Filter>Source Files</Filter>
+    </CudaCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">

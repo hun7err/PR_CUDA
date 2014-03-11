@@ -18,6 +18,7 @@ int main(int argc, char ** argv)
 	performMultiBlockTests();
 	printf("\n");
 	*/
+	performSharedMemTest();
 
 	system("PAUSE");
 	return 0;

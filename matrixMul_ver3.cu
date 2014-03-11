@@ -6,30 +6,30 @@
 
 template <int BLOCK_SIZE> __global__ void matrixMulSharedMemBasic(float *C, float *A, float *B, int width)
 {
-	int a_start = width * BLOCK_SIZE * blockIdx.y,
-		b_start = width * BLOCK_SIZE * blockIdx.x;
+	int a_start = width * BLOCK_SIZE * blockIdx.y;
 
 	__shared__ float A_shared[BLOCK_SIZE*BLOCK_SIZE];
 	__shared__ float B_shared[BLOCK_SIZE*BLOCK_SIZE];
 
 	float C_local = 0.0f;
 
-	for(int a_index = a_start; a_index < a_start + width - 1; a_index += BLOCK_SIZE * width)
+	int b_index = BLOCK_SIZE * blockIdx.x;
+
+	for(int a_index = a_start; a_index < a_start + width; a_index += BLOCK_SIZE)
 	{
-		for(int b_index = b_start; b_index < b_start + width - 1; b_index += BLOCK_SIZE * width)
+		A_shared[threadIdx.y * blockDim.x + threadIdx.x] = A[a_index + width * threadIdx.y + threadIdx.x];
+		B_shared[threadIdx.y * blockDim.x + threadIdx.x] = B[b_index + width * threadIdx.y + threadIdx.x];
+
+		__syncthreads();
+
+		for(int k = 0; k < BLOCK_SIZE; k++)
 		{
-			A_shared[threadIdx.y * blockDim.x + threadIdx.x] = A[a_index + size * threadIdx.y + threadIdx.x];
-			B_shared[threadIdx.y * blockDim.x + threadIdx.x] = B[b_index + size * threadIdx.y + threadIdx.x];
-
-			__syncthreads();
-
-			for(int k = 0; k < width; k++)
-			{
-				C_local += A_shared[threadIdx.y * blockDim.x + k] * B_shared[k * blockDim.x + threadIdx.x];
-			}
-
-			__syncthreads();
+			C_local += A_shared[threadIdx.y * BLOCK_SIZE + k] * B_shared[k * BLOCK_SIZE + threadIdx.x];
 		}
+
+		__syncthreads();
+
+		b_index += BLOCK_SIZE * width;
 	}
 
 	int c_start = width * BLOCK_SIZE * blockIdx.y + BLOCK_SIZE * blockIdx.x;
@@ -56,7 +56,6 @@ void performSharedMemTest(void)
 	cudaMemset(C_d, 0, width*width*sizeof(float));
 
 	matrixMulSharedMemBasic<2><<<dim3(2,2), dim3(2,2)>>>(C_d, A_d, B_d, width);
-
 	cudaMemcpy(C, C_d, width*width*sizeof(float), cudaMemcpyDeviceToHost);
 
 	printf("[\n");
@@ -69,7 +68,7 @@ void performSharedMemTest(void)
 		}
 		printf("],\n");
 	}
-	printf("]\n");
+	printf("]\n\n");
 
 	cudaFree(C_d);
 	cudaFree(B_d);
