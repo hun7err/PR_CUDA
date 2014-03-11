@@ -3,9 +3,12 @@
 
 extern void performMultiBlockTests(void);
 extern void performSingleBlockTests(void);
+//
+extern void performSharedMemTest(void);
 
 int main(int argc, char ** argv)
 {
+	/*
 	// wariant 1.
 	printf("=== Single block tests ===\n");
 	performSingleBlockTests();
@@ -14,6 +17,7 @@ int main(int argc, char ** argv)
 	printf("=== Multi block Tests ===\n");
 	performMultiBlockTests();
 	printf("\n");
+	*/
 
 	system("PAUSE");
 	return 0;

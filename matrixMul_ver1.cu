@@ -12,12 +12,12 @@ __global__ void matrixMulSingleBlock(float *C, float *A, float *B, int width)
 	int blocksPerDim = (int)ceil((float)width / (float)blockDim.x);
 	int row;
 	int col;
+	float C_local = 0;
 
 	for(int i = 0; i < blocksPerDim; i++)
 	{
 		for(int j = 0; j < blocksPerDim; j++)
 		{
-			float C_local = 0;
 			row = threadIdx.y + i * blockDim.y;
 			col = threadIdx.x + j * blockDim.x;
 
