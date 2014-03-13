@@ -6,6 +6,7 @@ extern void performSingleBlockTests(void);
 //
 extern void performSharedMemTest(void);
 extern void performImprovedSharedMemTest(void);
+extern void performImprovedSharedMemMultipleElemsTest(void);
 
 int main(int argc, char ** argv)
 {
@@ -20,7 +21,8 @@ int main(int argc, char ** argv)
 	printf("\n");
 	*/
 	//performSharedMemTest();
-	performImprovedSharedMemTest();
+	//performImprovedSharedMemTest();
+	performImprovedSharedMemMultipleElemsTest();
 
 	system("PAUSE");
 	return 0;
