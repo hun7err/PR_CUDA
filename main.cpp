@@ -5,6 +5,7 @@ extern void performMultiBlockTests(void);
 extern void performSingleBlockTests(void);
 //
 extern void performSharedMemTest(void);
+extern void performImprovedSharedMemTest(void);
 
 int main(int argc, char ** argv)
 {
@@ -18,7 +19,8 @@ int main(int argc, char ** argv)
 	performMultiBlockTests();
 	printf("\n");
 	*/
-	performSharedMemTest();
+	//performSharedMemTest();
+	performImprovedSharedMemTest();
 
 	system("PAUSE");
 	return 0;

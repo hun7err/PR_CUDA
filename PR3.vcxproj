@@ -161,6 +161,9 @@
     <CudaCompile Include="matrixMul_ver3.cu">
       <FileType>CppCode</FileType>
     </CudaCompile>
+    <CudaCompile Include="matrixMul_ver4.cu">
+      <FileType>CppCode</FileType>
+    </CudaCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="genmatrix.cpp" />
