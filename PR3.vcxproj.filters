@@ -30,6 +30,9 @@
     <CudaCompile Include="matrixMul_ver4.cu">
       <Filter>Source Files</Filter>
     </CudaCompile>
+    <CudaCompile Include="matrixMul_ver5.cu">
+      <Filter>Source Files</Filter>
+    </CudaCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
