@@ -4,7 +4,7 @@
 
 #include <cuda_runtime.h>
 
-template <int BLOCK_SIZE> __global__ void matrixMulSharedMemPrefetchMultipleElements(float *C, float *A, float *B, int width) // dodaæ sprawdzanie < width
+template <int BLOCK_SIZE, int elemsPerThread> __global__ void matrixMulSharedMemPrefetchMultipleElements(float *C, float *A, float *B, int width) // dodaæ sprawdzanie < width
 {
 	int a_start = width * BLOCK_SIZE * blockIdx.y, a_offset,
 		b_start = BLOCK_SIZE * blockIdx.x, b_offset;
@@ -12,18 +12,58 @@ template <int BLOCK_SIZE> __global__ void matrixMulSharedMemPrefetchMultipleElem
 	__shared__ float A_shared[BLOCK_SIZE*BLOCK_SIZE];
 	__shared__ float B_shared[BLOCK_SIZE*BLOCK_SIZE];
 
-	float C_local = 0.0f;
+	//float C_local = 0.0f;
+	int element_id = 0;
 
-	float a_prefetched = A[a_start + threadIdx.y * width + threadIdx.x],
+	float C_local[elemsPerThread] = {0};
+
+	/*float a_prefetched = A[a_start + threadIdx.y * width + threadIdx.x],
 			b_prefetched = B[b_start + threadIdx.y * width + threadIdx.x];
+			*/
+	float a_prefetched[elemsPerThread],
+		b_prefetched[elemsPerThread];
+
+	for(int element_id = 0; element_id < elemsPerThread; element_id++)
+	{
+		a_prefetched[element_id] = A[a_start + threadIdx.y * width + threadIdx.x + element_id];
+		b_prefetched[element_id] = B[b_start + (threadIdx.y + element_id) * width + threadIdx.x];
+	}
 
 	for(int index = 0; index < gridDim.x;) // równie dobrze mog³oby byæ gridDim.y bo s¹ równe
 	{
 		++index;
 
-		a_offset = index * BLOCK_SIZE;
-		b_offset = index * BLOCK_SIZE * width;
+		a_offset = index * (BLOCK_SIZE + elemsPerThread);
+		b_offset = index * (BLOCK_SIZE + elemsPerThread) * width;
 
+		// new
+		for(int element_id = 0; element_id < elemsPerThread; element_id++)
+		{
+			A_shared[threadIdx.y * blockDim.x + threadIdx.x + element_id] = a_prefetched[element_id];
+			B_shared[(threadIdx.y + element_id) * blockDim.x + threadIdx.x] = b_prefetched[element_id];
+
+			if(index + element_id < gridDim.x)
+			{
+				a_prefetched[element_id] = A[a_start + a_offset + threadIdx.y * width + (threadIdx.x + element_id)];
+				b_prefetched[element_id] = B[b_start + b_offset + (threadIdx.y + element_id) * width + threadIdx.x];
+			}
+
+			__syncthreads();
+
+			for(int k = 0; k < BLOCK_SIZE; k++)
+			{
+				C_local += A_shared[threadIdx.y * BLOCK_SIZE + k] * B_shared[k * BLOCK_SIZE + threadIdx.x];
+			}
+
+			__syncthreads();
+
+			if(index * (BLOCK_SIZE + element_id) >= width)
+				break;
+
+			__syncthreads();
+		}
+		/*
+		// old
 		A_shared[threadIdx.y * blockDim.x + threadIdx.x] = a_prefetched;
 		B_shared[threadIdx.y * blockDim.x + threadIdx.x] = b_prefetched;
 
@@ -45,12 +85,20 @@ template <int BLOCK_SIZE> __global__ void matrixMulSharedMemPrefetchMultipleElem
 		__syncthreads(); // bariera synchronizacyjna, czekamy a¿ wszystkie w¹tki w bloku oblicz¹ wynik cz¹stkowy
 
 		if(index * BLOCK_SIZE >= width)
-			break;
+			break;*/
 	}
 	
-	int c_start = blockIdx.y * width * BLOCK_SIZE,
+	/*int c_start = blockIdx.y * width * BLOCK_SIZE,
 		c_offset = blockIdx.x * BLOCK_SIZE;
-	C[c_start + c_offset + width * threadIdx.y + threadIdx.x] = C_local;
+	C[c_start + c_offset + width * threadIdx.y + threadIdx.x] = C_local;*/
+
+	int c_start = blockIdx.y * width * (BLOCK_SIZE+elemsPerThread),
+		c_offset = blockIdx.x * (BLOCK_SIZE + elemsPerThread);
+
+	for(int element_id = 0; element_id < elemsPerThread; element_id++)
+	{
+		C[c_start + c_offset + width * threadIdx.y + threadIdx.x + element_id] = C_local[element_id];
+	}
 }
 
 void performImprovedSharedMemMultipleElemsTest(void)
