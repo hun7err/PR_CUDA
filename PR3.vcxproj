@@ -109,6 +109,10 @@
       <TargetMachinePlatform>64</TargetMachinePlatform>
       <CodeGeneration>
       </CodeGeneration>
+      <CInterleavedPTX>true</CInterleavedPTX>
+      <GenerateLineInfo>true</GenerateLineInfo>
+      <PtxAsOptionV>true</PtxAsOptionV>
+      <Warning>Wall</Warning>
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -142,14 +146,12 @@
     <CudaCompile>
       <TargetMachinePlatform>64</TargetMachinePlatform>
       <CodeGeneration />
+      <Warning>Wall</Warning>
+      <PtxAsOptionV>true</PtxAsOptionV>
+      <CInterleavedPTX>true</CInterleavedPTX>
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <CudaCompile Include="matrixMul.cu">
-      <FileType>CppCode</FileType>
-      <DeploymentContent>false</DeploymentContent>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
-    </CudaCompile>
     <CudaCompile Include="matrixMul_ver1.cu">
       <FileType>CppCode</FileType>
       <DeploymentContent>true</DeploymentContent>

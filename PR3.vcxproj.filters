@@ -18,9 +18,6 @@
     <CudaCompile Include="matrixMul_ver1.cu">
       <Filter>Source Files</Filter>
     </CudaCompile>
-    <CudaCompile Include="matrixMul.cu">
-      <Filter>Source Files</Filter>
-    </CudaCompile>
     <CudaCompile Include="matrixMul_ver2.cu">
       <Filter>Source Files</Filter>
     </CudaCompile>

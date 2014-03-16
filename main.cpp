@@ -20,8 +20,10 @@ int main(int argc, char ** argv)
 	performMultiBlockTests();
 	printf("\n");
 	*/
-	//performSharedMemTest();
-	//performImprovedSharedMemTest();
+	/*printf("Basic SharedMem\n");
+	performSharedMemTest();
+	printf("Improved SharedMem\n");
+	performImprovedSharedMemTest();*/
 	performImprovedSharedMemMultipleElemsTest();
 
 	system("PAUSE");
