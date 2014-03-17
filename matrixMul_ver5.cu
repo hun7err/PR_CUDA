@@ -7,8 +7,8 @@
 
 template <int BLOCK_SIZE, int threadElemsPerDim> __global__ void matrixMulSharedMemPrefetchMultipleElements(float *C, float *A, float *B, int width) // sprawdziæ czemu to nie dzia³a
 {
-	int a_start = width * BLOCK_SIZE * threadElemsPerDim * blockIdx.y, a_offset, // ok
-		b_start = BLOCK_SIZE * threadElemsPerDim * blockIdx.x, b_offset;		// 
+	int a_start = width * BLOCK_SIZE * threadElemsPerDim * blockIdx.y, a_offset, // pocz¹tek wiersza z A przez który bêdziemy siê przeiterowywaæ
+		b_start = BLOCK_SIZE * threadElemsPerDim * blockIdx.x, b_offset;		 // pocz¹tek kolumny z B przez któr¹ bêdziemy siê przeiterowywaæ
 
 	__shared__ float A_shared[BLOCK_SIZE*threadElemsPerDim*BLOCK_SIZE*threadElemsPerDim];
 	__shared__ float B_shared[BLOCK_SIZE*threadElemsPerDim*BLOCK_SIZE*threadElemsPerDim];
@@ -30,7 +30,7 @@ template <int BLOCK_SIZE, int threadElemsPerDim> __global__ void matrixMulShared
 			C_local[row*threadElemsPerDim+col] = 0.0f;
 		}
 	}
-
+	// up: domniemanie poprawnoœci
 
 	for(int index = 0; index < gridDim.x;) // równie dobrze mog³oby byæ gridDim.y bo s¹ równe
 	{
@@ -39,15 +39,16 @@ template <int BLOCK_SIZE, int threadElemsPerDim> __global__ void matrixMulShared
 		a_offset = index * BLOCK_SIZE * threadElemsPerDim;
 		b_offset = index * BLOCK_SIZE * threadElemsPerDim * width;
 
+		// <ok>
 		for(row = 0; row < threadElemsPerDim; row++)
 		{
 			for(col = 0; col < threadElemsPerDim; col++)
 			{
 				A_shared[(threadIdx.y + row) * blockDim.x * threadElemsPerDim + threadIdx.x + col] = a_prefetched[row*threadElemsPerDim+col];
 				B_shared[(threadIdx.y + row) * blockDim.x * threadElemsPerDim + threadIdx.x + col] = b_prefetched[row*threadElemsPerDim+col];
-				
 			}
 		}
+		// </ok>
 
 		__syncthreads(); // bariera synchronizacyjna, czekamy a¿ wszystkie w¹tki w bloku wype³ni¹ pamiêæ wspó³dzielon¹
 
@@ -55,7 +56,7 @@ template <int BLOCK_SIZE, int threadElemsPerDim> __global__ void matrixMulShared
 		{
 			for(col = 0; col < threadElemsPerDim; col++)
 			{
-				if(a_start + a_offset + (threadIdx.y + row) * width + threadIdx.x + col < width)
+				if(index < gridDim.x)
 				{
 					a_prefetched[row*threadElemsPerDim+col] = A[a_start + a_offset + (threadIdx.y + row) * width + threadIdx.x + col];
 					b_prefetched[row*threadElemsPerDim+col] = B[b_start + b_offset + (threadIdx.y + row) * width + threadIdx.x + col];
