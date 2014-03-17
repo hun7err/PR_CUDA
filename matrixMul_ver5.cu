@@ -30,7 +30,6 @@ template <int BLOCK_SIZE, int threadElemsPerDim> __global__ void matrixMulShared
 			C_local[row*threadElemsPerDim+col] = 0.0f;
 		}
 	}
-	//float a_prefetched = A[a_start + threadIdx.y * width + threadIdx.x], b_prefetched = B[b_start + threadIdx.y * width + threadIdx.x];
 
 
 	for(int index = 0; index < gridDim.x;) // równie dobrze mog³oby byæ gridDim.y bo s¹ równe
@@ -46,25 +45,25 @@ template <int BLOCK_SIZE, int threadElemsPerDim> __global__ void matrixMulShared
 			{
 				A_shared[(threadIdx.y + row) * blockDim.x * threadElemsPerDim + threadIdx.x + col] = a_prefetched[row*threadElemsPerDim+col];
 				B_shared[(threadIdx.y + row) * blockDim.x * threadElemsPerDim + threadIdx.x + col] = b_prefetched[row*threadElemsPerDim+col];
-
-				if(a_start + a_offset + (threadIdx.y + row) * width + threadIdx.x + col < width)
-				{
-					a_prefetched[row*threadElemsPerDim+col] = A[a_start + a_offset + (threadIdx.y + row) * width + threadIdx.x + col];
-					b_prefetched[row*threadElemsPerDim+col] = B[b_start + b_offset + (threadIdx.y + row) * width + threadIdx.x + col];
-				}
+				
 			}
 		}
 
 		__syncthreads(); // bariera synchronizacyjna, czekamy a¿ wszystkie w¹tki w bloku wype³ni¹ pamiêæ wspó³dzielon¹
 
-				//
 		for(row = 0; row < threadElemsPerDim; row++)
 		{
 			for(col = 0; col < threadElemsPerDim; col++)
 			{
+				if(a_start + a_offset + (threadIdx.y + row) * width + threadIdx.x + col < width)
+				{
+					a_prefetched[row*threadElemsPerDim+col] = A[a_start + a_offset + (threadIdx.y + row) * width + threadIdx.x + col];
+					b_prefetched[row*threadElemsPerDim+col] = B[b_start + b_offset + (threadIdx.y + row) * width + threadIdx.x + col];
+				}
+			
 				for(int k = 0; k < BLOCK_SIZE*threadElemsPerDim; k++)
 				{
-					C_local[row*threadElemsPerDim+col] += A_shared[(threadIdx.y + row) * BLOCK_SIZE * threadElemsPerDim + k + col] * B_shared[(k + row) * BLOCK_SIZE * threadElemsPerDim + threadIdx.x + col];
+					C_local[row*threadElemsPerDim+col] += A_shared[(threadIdx.y + row) * BLOCK_SIZE * threadElemsPerDim + k] * B_shared[k * BLOCK_SIZE * threadElemsPerDim + threadIdx.x + col];
 				}
 			}
 		}

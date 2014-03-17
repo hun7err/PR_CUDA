@@ -26,16 +26,14 @@ template <int BLOCK_SIZE> __global__ void matrixMulSharedMemPrefetch(float *C, f
 
 		A_shared[threadIdx.y * blockDim.x + threadIdx.x] = a_prefetched;
 		B_shared[threadIdx.y * blockDim.x + threadIdx.x] = b_prefetched;
+		
+		__syncthreads();
 
 		if(index < gridDim.x)
 		{
 			a_prefetched = A[a_start + a_offset + threadIdx.y * width + threadIdx.x];
 			b_prefetched = B[b_start + b_offset + threadIdx.y * width + threadIdx.x];
 		}
-
-		__syncthreads(); // bariera synchronizacyjna, czekamy a¿ wszystkie w¹tki w bloku wype³ni¹ pamiêæ wspó³dzielon¹
-
-		//
 
 		for(int k = 0; k < BLOCK_SIZE; k++)
 		{
