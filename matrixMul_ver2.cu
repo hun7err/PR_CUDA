@@ -25,12 +25,10 @@
 }
 
 static float totalTime = 0.0f;
-#define TEST_COUNT 300
+#define TEST_COUNT 42
 
 int performMultiBlockTest(dim3 block_size, int width)
 {
-	printf("Block size (%d,%d) matrix width %d\n", block_size.x, block_size.y, width);
-
 	cudaError_t error;
 
 	float *A = (float*)malloc(width*width*sizeof(float));
@@ -110,9 +108,10 @@ int performMultiBlockTest(dim3 block_size, int width)
 		return -1;
 	}
 
+	int grid_side = (int)ceil((float)width/(float)block_size.x);
 	for(int current_test = 0; current_test < TEST_COUNT; current_test++)
 	{
-		matrixMulMultiBlock<<<dim3((int)ceil((float)width/(float)block_size.x), (int)ceil((float)width/(float)block_size.y)),block_size>>>(C_d, A_d, B_d, width);
+		matrixMulMultiBlock<<<dim3(grid_side, grid_side),block_size>>>(C_d, A_d, B_d, width);
 	}
 
 	error = cudaEventRecord(stop, NULL);
@@ -144,7 +143,7 @@ int performMultiBlockTest(dim3 block_size, int width)
     double flopsPerMatrixMul = 2.0 * (double)width * (double)width * (double)width;
     double gigaFlops = (flopsPerMatrixMul * 1.0e-9f) / (msecPerMatrixMul / 1000.0f);
 
-	printf("Performance: %.2f GFlop/s, time: %.3f ms\n", gigaFlops, msecPerMatrixMul);
+	printf("%dx%d\t%dx%d\t%dx%d\t%.3f\t%.2f\n", width, width, block_size.x, block_size.y, grid_side, grid_side, msecPerMatrixMul, gigaFlops);
 
 	error = cudaMemcpy(C, C_d, width*width*sizeof(float), cudaMemcpyDeviceToHost);
 	
@@ -177,13 +176,9 @@ void performMultiBlockTests(void)
 
 	for(int i = 0; i < sizeof(matrixSizes)/sizeof(int); i++)
 	{
-		printf("+++ %dx%d matrix +++\n", matrixSizes[i], matrixSizes[i]);
-
 		for(int j = 0; j < sizeof(blockSizes)/sizeof(dim3); j++)
 		{
-			printf("%dx%d block\n", blockSizes[i].x, blockSizes[i].y);
-
-			performMultiBlockTest(blockSizes[i], matrixSizes[i]);
+			performMultiBlockTest(blockSizes[j], matrixSizes[i]);
 		}
 	}
 }

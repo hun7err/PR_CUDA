@@ -36,12 +36,10 @@ __global__ void matrixMulSingleBlock(float *C, float *A, float *B, int width)
 }
 
 static float totalTime = 0.0f;
-#define TEST_COUNT 300
+#define TEST_COUNT 42
 
 int performSingleBlockTest(dim3 block_size, int width)
 {
-	printf("Block size (%d,%d) matrix width %d\n", block_size.x, block_size.y, width);
-
 	cudaError_t error;
 
 	float *A = (float*)malloc(width*width*sizeof(float));
@@ -154,8 +152,8 @@ int performSingleBlockTest(dim3 block_size, int width)
 	float msecPerMatrixMul = totalTime / (float)TEST_COUNT;
     double flopsPerMatrixMul = 2.0 * (double)width * (double)width * (double)width;
     double gigaFlops = (flopsPerMatrixMul * 1.0e-9f) / (msecPerMatrixMul / 1000.0f);
-
-	printf("Performance: %.2f GFlop/s, time: %.3f ms\n", gigaFlops, msecPerMatrixMul);
+	
+	printf("%dx%d\t%dx%d\t%.3f\t%.2f\n", width, width, block_size.x, block_size.y, msecPerMatrixMul, gigaFlops);
 
 	error = cudaMemcpy(C, C_d, width*width*sizeof(float), cudaMemcpyDeviceToHost);
 	
@@ -181,29 +179,23 @@ int performSingleBlockTest(dim3 block_size, int width)
 
 void performSingleBlockTests()
 {
-	printf("+++ Static block size +++\n");
-	int matrixSizes[] = {32,64,128};
-	printf("16x16 block\n");
-	for(int i = 0; i < sizeof(matrixSizes)/sizeof(int); i++)
-	{
-		performSingleBlockTest(dim3(16,16), matrixSizes[i]);
-	}
-	printf("32x32 block\n");
-	for(int i = 0; i < sizeof(matrixSizes)/sizeof(int); i++)
-	{
-		performSingleBlockTest(dim3(32,32), matrixSizes[i]);
-	}
-	printf("+++ Dynamic block sizes +++\n");
+	int matrixSizes[] = { 32, 64, 128 };
 	dim3 blockSizes[] = {dim3(8,8), dim3(16,16), dim3(22,22), dim3(32,32)};
-	printf("32x32 matrix\n");
-	for(int i = 0; i < sizeof(blockSizes)/sizeof(dim3); i++)
+	
+	for(int i = 1; i < sizeof(blockSizes)/sizeof(dim3); i += 2)
 	{
-		performSingleBlockTest(blockSizes[i], 32);
+		for(int j = 0; j < sizeof(matrixSizes)/sizeof(int); j++)
+		{
+			performSingleBlockTest(blockSizes[i], matrixSizes[j]);
+		}
 	}
-	printf("128x128 matrix\n");
+
 	for(int i = 0; i < sizeof(blockSizes)/sizeof(dim3); i++)
 	{
-		performSingleBlockTest(blockSizes[i], 128);
+		for(int j = 0; j < sizeof(matrixSizes)/sizeof(int); j += 2)
+		{
+			performSingleBlockTest(blockSizes[i], matrixSizes[j]);
+		}
 	}
 
 
