@@ -122,6 +122,8 @@ int performSingleBlockTest(dim3 block_size, int width)
 	for(int current_test = 0; current_test < TEST_COUNT; current_test++)
 	{
 		matrixMulSingleBlock<<<dim3((int)ceil((float)width/(float)block_size.x), (int)ceil((float)width/(float)block_size.y)),block_size>>>(C_d, A_d, B_d, width);
+
+		cudaDeviceSynchronize();
 	}
 
 	error = cudaEventRecord(stop, NULL);

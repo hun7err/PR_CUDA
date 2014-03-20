@@ -1,36 +1,30 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <io.h>
+#include <fcntl.h>
 
 extern void performSingleBlockTests(void);
 extern void performMultiBlockTests(void);
 extern void performSharedMemTests(void);
-
-extern void performImprovedSharedMemTest(void);
-extern void performImprovedSharedMemMultipleElemsTest(void);
+extern void performImprovedSharedMemTests(void);
+extern void performImprovedSharedMemMultipleElemsTests(void);
 
 int main(int argc, char ** argv)
 {
-	if(argc != 2)
+	if(argc < 2)
 	{
-		printf("Uzycie: %s numer_testu [nazwa_pliku]\n", argv[0]);
+		printf("Uzycie: %s numer_testu\n", argv[0]);
 		printf("numer_testu: liczba calkowita z przedzialu domknietego [1,5]\n");
 		printf("1 - jeden blok watkow\n"
 				"2 - grid wieloblokowy\n"
 				"3 - wykorzystanie pamieci wspoldzielonej\n"
 				"4 - wersja 3. + zrownoleglenie pobierania danych do pamieci wspoldz. i obliczen\n"
 				"5 - wersja 4. + wiecej pracy per watek\n");
-		printf("nazwa_pliku: nazwa pliku, w ktorym zapisane zostana wyniki\n");
 
-		//return 1;
+		return 1;
 	}
 
-	int test = 3; //atoi(argv[1]);
-	
-	if(argc > 2)
-	{
-		// otworz plik i przekieruj tam stdout
-	}
-	
+	int test = atoi(argv[1]);
 	
 	switch(test)
 	{
@@ -47,13 +41,14 @@ int main(int argc, char ** argv)
 			performSharedMemTests();
 		break;
 		case 4:
-			printf("Macierz\tBlokGrid\t\tCzas\tGFLOPS\n");
+			printf("Macierz\tBlok\tGrid\tCzas\tGFLOPS\n");
+			performImprovedSharedMemTests();
 		break;
 		case 5:
-			printf("Macierz\tOr. blok\tEpW\tGrid\tCzas\tGFLOPS\n"); // EpW = elementy per w¹tek, or. blok = oryginalny blok
+			printf("Macierz\tOryginalny blok\tNowy blok\tGrid\tCzas\tGFLOPS\n"); // EpW = elementy per w¹tek, or. blok = oryginalny blok
+			performImprovedSharedMemMultipleElemsTests();
 		break;
 	}
-
 	// przywroc normalne stdout
 
 	/*

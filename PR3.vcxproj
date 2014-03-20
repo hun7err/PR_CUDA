@@ -99,6 +99,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -107,8 +108,7 @@
     </Link>
     <CudaCompile>
       <TargetMachinePlatform>64</TargetMachinePlatform>
-      <CodeGeneration>
-      </CodeGeneration>
+      <CodeGeneration>compute_20,sm_20</CodeGeneration>
       <CInterleavedPTX>true</CInterleavedPTX>
       <GenerateLineInfo>true</GenerateLineInfo>
       <PtxAsOptionV>true</PtxAsOptionV>
@@ -136,6 +136,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -145,7 +146,7 @@
     </Link>
     <CudaCompile>
       <TargetMachinePlatform>64</TargetMachinePlatform>
-      <CodeGeneration />
+      <CodeGeneration>compute_20,sm_20</CodeGeneration>
       <Warning>Wall</Warning>
       <PtxAsOptionV>true</PtxAsOptionV>
       <CInterleavedPTX>true</CInterleavedPTX>

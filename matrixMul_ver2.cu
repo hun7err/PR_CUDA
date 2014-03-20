@@ -112,6 +112,8 @@ int performMultiBlockTest(dim3 block_size, int width)
 	for(int current_test = 0; current_test < TEST_COUNT; current_test++)
 	{
 		matrixMulMultiBlock<<<dim3(grid_side, grid_side),block_size>>>(C_d, A_d, B_d, width);
+
+		cudaDeviceSynchronize();
 	}
 
 	error = cudaEventRecord(stop, NULL);
