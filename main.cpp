@@ -49,7 +49,7 @@ int main(int argc, char ** argv)
 			performImprovedSharedMemMultipleElemsTests();
 		break;
 	}
-	// przywroc normalne stdout
+	//przywroc normalne stdout
 
 	/*
 	// wariant 1.
@@ -66,6 +66,6 @@ int main(int argc, char ** argv)
 	performImprovedSharedMemTest();*/
 	//performImprovedSharedMemMultipleElemsTest();
 
-	system("PAUSE");
+	//system("PAUSE");
 	return 0;
 }

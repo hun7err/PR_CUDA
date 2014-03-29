@@ -55,7 +55,6 @@ template <int BLOCK_SIZE> __global__ void matrixMulSharedMemPrefetch(float *C, f
 }
 
 static float totalTime = 0.0f;
-#define TEST_COUNT 42 // inside joke
 
 int performImprovedSharedMemTest(dim3 block_size, int width)
 {
@@ -228,4 +227,6 @@ void performImprovedSharedMemTests(void)
 			performImprovedSharedMemTest(blockSizes[j], matrixSizes[i]);
 		}
 	}
+
+	cudaDeviceReset();
 }

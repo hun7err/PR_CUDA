@@ -36,7 +36,6 @@ __global__ void matrixMulSingleBlock(float *C, float *A, float *B, int width)
 }
 
 static float totalTime = 0.0f;
-#define TEST_COUNT 42
 
 int performSingleBlockTest(dim3 block_size, int width)
 {
@@ -200,6 +199,6 @@ void performSingleBlockTests()
 		}
 	}
 
-
+	cudaDeviceReset();
 	//
 }

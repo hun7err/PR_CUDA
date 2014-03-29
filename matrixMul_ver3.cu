@@ -44,7 +44,6 @@ template <int BLOCK_SIZE> __global__ void matrixMulSharedMemBasic(float *C, floa
 }
 
 static float totalTime = 0.0f;
-#define TEST_COUNT 42 // inside joke
 
 int performSharedMemTest(dim3 block_size, int width)
 {
@@ -221,4 +220,6 @@ void performSharedMemTests(void)
 			performSharedMemTest(blockSizes[j], matrixSizes[i]);
 		}
 	}
+
+	cudaDeviceReset();
 }

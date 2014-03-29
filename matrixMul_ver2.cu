@@ -25,7 +25,6 @@
 }
 
 static float totalTime = 0.0f;
-#define TEST_COUNT 42
 
 int performMultiBlockTest(dim3 block_size, int width)
 {
@@ -183,4 +182,6 @@ void performMultiBlockTests(void)
 			performMultiBlockTest(blockSizes[j], matrixSizes[i]);
 		}
 	}
+
+	cudaDeviceReset();
 }
