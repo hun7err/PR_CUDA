@@ -20,9 +20,9 @@ template <int BLOCK_SIZE> __global__ void matrixMulSharedMemPrefetch(float *C, f
 	float a_prefetched = A[a_start + threadIdx.y * width + threadIdx.x],
 			b_prefetched = B[b_start + threadIdx.y * width + threadIdx.x];
 
-	for(int index = 0; index < gridDim.x;) // równie dobrze mog³oby byæ gridDim.y bo s¹ równe
+	for(int index = 1; index <= gridDim.x; index++) // równie dobrze mog³oby byæ gridDim.y bo s¹ równe
 	{
-		++index;
+		//++index;
 
 		a_offset = index * BLOCK_SIZE;
 		b_offset = index * BLOCK_SIZE * width;

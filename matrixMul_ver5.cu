@@ -5,7 +5,7 @@
 #include <time.h>
 #include "genmatrix.h"
 
-#include <cuda_runtime.h>
+#include <cuda_runtime.h> 
 
 template <int BLOCK_SIZE, int threadElemsPerDim> __global__ void matrixMulSharedMemPrefetchMultipleElements(float *C, float *A, float *B, int width) // sprawdziæ czemu to nie dzia³a
 {
@@ -34,9 +34,9 @@ template <int BLOCK_SIZE, int threadElemsPerDim> __global__ void matrixMulShared
 	}
 	// up: domniemanie poprawnoœci
 
-	for(int index = 0; index < gridDim.x;) // równie dobrze mog³oby byæ gridDim.y bo s¹ równe
+	for(int index = 1; index <= gridDim.x; index++) // równie dobrze mog³oby byæ gridDim.y bo s¹ równe
 	{
-		++index;
+		//++index;
 
 		a_offset = index * BLOCK_SIZE * threadElemsPerDim;
 		b_offset = index * BLOCK_SIZE * threadElemsPerDim * width;
@@ -254,7 +254,7 @@ void performImprovedSharedMemMultipleElemsTests(void)
 {
 	srand((unsigned int)time(NULL));
 
-	dim3 blockSizes[] = { dim3(8/THREAD_ELEMENTS_PER_DIM,8/THREAD_ELEMENTS_PER_DIM), dim3(16/THREAD_ELEMENTS_PER_DIM,16/THREAD_ELEMENTS_PER_DIM), dim3(22/THREAD_ELEMENTS_PER_DIM,22/THREAD_ELEMENTS_PER_DIM), dim3(32/THREAD_ELEMENTS_PER_DIM,32/THREAD_ELEMENTS_PER_DIM) };
+	dim3 blockSizes[] = { dim3(8/THREAD_ELEMENTS_PER_DIM,8/THREAD_ELEMENTS_PER_DIM), dim3(8/THREAD_ELEMENTS_PER_DIM,8/THREAD_ELEMENTS_PER_DIM), dim3(16/THREAD_ELEMENTS_PER_DIM,16/THREAD_ELEMENTS_PER_DIM), dim3(16/THREAD_ELEMENTS_PER_DIM,16/THREAD_ELEMENTS_PER_DIM), dim3(22/THREAD_ELEMENTS_PER_DIM,22/THREAD_ELEMENTS_PER_DIM), dim3(22/THREAD_ELEMENTS_PER_DIM,22/THREAD_ELEMENTS_PER_DIM), dim3(32/THREAD_ELEMENTS_PER_DIM,32/THREAD_ELEMENTS_PER_DIM), dim3(32/THREAD_ELEMENTS_PER_DIM,32/THREAD_ELEMENTS_PER_DIM) };
 	int matrixSizes[] = { 32, 64, 128 };
 
 	for(int i = 0; i < sizeof(matrixSizes)/sizeof(int); i++)

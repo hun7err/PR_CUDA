@@ -145,8 +145,8 @@ int performSharedMemTest(dim3 block_size, int width)
 				matrixMulSharedMemBasic<32><<<dim3(grid_side, grid_side), block_size>>>(C_d, A_d, B_d, width);
 			break;
 
-			cudaDeviceSynchronize();
 		}
+		cudaDeviceSynchronize();
 	}
 
 	error = cudaEventRecord(stop, NULL);

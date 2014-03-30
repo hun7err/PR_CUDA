@@ -3,6 +3,6 @@
 
 void generateTestMatrix(float *matPtr, int width);
 
-#define TEST_COUNT 25
+#define TEST_COUNT 100
 
 #endif // __GENMATRIX_H__
